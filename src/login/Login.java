@@ -295,9 +295,15 @@ public class Login extends javax.swing.JFrame {
                         return;
                     }
                     if (contrasenaArchivo.equals(contrasenaEncriptada)) {
-                        MenuPrincipalAdmin ventanaPrincipal = new MenuPrincipalAdmin();
-                        ventanaPrincipal.setVisible(true);
-                        ventanaPrincipal.setLocationRelativeTo(null);
+                        if (rol.equals("Administrador")) {
+                            MenuPrincipalAdmin ventanaPrincipal = new MenuPrincipalAdmin();
+                            ventanaPrincipal.setVisible(true);
+                            ventanaPrincipal.setLocationRelativeTo(null);
+                        } else {
+                            MenuPrincipalVendedor ventanaPrincipal = new MenuPrincipalVendedor();
+                            ventanaPrincipal.setVisible(true);
+                            ventanaPrincipal.setLocationRelativeTo(null);
+                        }
                         this.setVisible(false);
                         return;
                     } else {
