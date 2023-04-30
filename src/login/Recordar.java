@@ -156,7 +156,7 @@ public class Recordar extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void myButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton1ActionPerformed
-        String archivo = "usuarios.csv";
+        String archivo = "db/usuarios.csv";
 
         String usuario = txtUsuario.getText();
         String palabra = txtPalabra.getText();

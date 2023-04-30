@@ -258,7 +258,7 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_myButton2ActionPerformed
 
     private void myButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton3ActionPerformed
-        String archivo = "usuarios.csv";
+        String archivo = "db/usuarios.csv";
         String usuario = txtUsuario.getText();
         String contrasena = txtContrasena.getText();
 
@@ -276,7 +276,7 @@ public class Login extends javax.swing.JFrame {
                 int id = Integer.parseInt(campos[0]);
                 String usuarioArchivo = campos[1];
                 String contrasenaArchivo = campos[2];
-                String rol = campos[3];
+                String rol = campos[4];
 
                 if (usuarioArchivo.equalsIgnoreCase(usuario)) {
                     usuarioEncontrado = true;
@@ -296,9 +296,9 @@ public class Login extends javax.swing.JFrame {
                     }
                     if (contrasenaArchivo.equals(contrasenaEncriptada)) {
                         if (rol.equals("Administrador")) {
-                            MenuPrincipalAdmin ventanaPrincipal = new MenuPrincipalAdmin();
-                            ventanaPrincipal.setVisible(true);
-                            ventanaPrincipal.setLocationRelativeTo(null);
+                            MenuPrincipalAdmin ventanaPrincipalAdmin = new MenuPrincipalAdmin();
+                            ventanaPrincipalAdmin.setVisible(true);
+                            ventanaPrincipalAdmin.setLocationRelativeTo(null);
                         } else {
                             MenuPrincipalVendedor ventanaPrincipal = new MenuPrincipalVendedor();
                             ventanaPrincipal.setVisible(true);
