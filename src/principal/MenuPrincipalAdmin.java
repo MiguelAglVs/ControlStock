@@ -15,6 +15,7 @@ import clases.*;
 import login.Login;
 
 import desplazable.Desface;
+import java.io.FileWriter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -108,7 +109,13 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         jLabel18 = new javax.swing.JLabel();
         jSeparator4 = new javax.swing.JSeparator();
         jLabel19 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        nombretxt = new principal.MyTextField();
+        jLabel9 = new javax.swing.JLabel();
+        reftxt = new principal.MyTextField();
+        jLabel10 = new javax.swing.JLabel();
+        addProduct = new principal.MyButton();
+        cantidadtxt1 = new principal.MyTextField();
         pnlVentas = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
@@ -332,11 +339,67 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         jLabel19.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         pnlAddProduct.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
 
-        jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        jLabel25.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel25.setText("Panel 3");
-        jLabel25.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        pnlAddProduct.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 210, 170, 60));
+        jLabel8.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel8.setText("Nombre:");
+        pnlAddProduct.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, -1, -1));
+
+        nombretxt.setBackground(new java.awt.Color(251, 252, 253));
+        nombretxt.setForeground(new java.awt.Color(58, 59, 69));
+        nombretxt.setBorderColor(new java.awt.Color(209, 211, 225));
+        nombretxt.setCaretColor(new java.awt.Color(187, 187, 187));
+        nombretxt.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        nombretxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nombretxtActionPerformed(evt);
+            }
+        });
+        pnlAddProduct.add(nombretxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 170, 270, 50));
+
+        jLabel9.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel9.setText("Cantidad:");
+        pnlAddProduct.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 150, -1, -1));
+
+        reftxt.setBackground(new java.awt.Color(251, 252, 253));
+        reftxt.setForeground(new java.awt.Color(58, 59, 69));
+        reftxt.setBorderColor(new java.awt.Color(209, 211, 225));
+        reftxt.setCaretColor(new java.awt.Color(187, 187, 187));
+        reftxt.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        reftxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reftxtActionPerformed(evt);
+            }
+        });
+        pnlAddProduct.add(reftxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 260, 270, 50));
+
+        jLabel10.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel10.setText("Referencia:");
+        pnlAddProduct.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 240, -1, -1));
+
+        addProduct.setForeground(new java.awt.Color(251, 252, 253));
+        addProduct.setText("Agregar");
+        addProduct.setBorderColor(new java.awt.Color(251, 252, 253));
+        addProduct.setBorderPainted(false);
+        addProduct.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addProductActionPerformed(evt);
+            }
+        });
+        pnlAddProduct.add(addProduct, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 260, 270, 50));
+
+        cantidadtxt1.setBackground(new java.awt.Color(251, 252, 253));
+        cantidadtxt1.setForeground(new java.awt.Color(58, 59, 69));
+        cantidadtxt1.setBorderColor(new java.awt.Color(209, 211, 225));
+        cantidadtxt1.setCaretColor(new java.awt.Color(187, 187, 187));
+        cantidadtxt1.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        cantidadtxt1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cantidadtxt1ActionPerformed(evt);
+            }
+        });
+        pnlAddProduct.add(cantidadtxt1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 170, 270, 50));
 
         Paginas.add(pnlAddProduct, "card4");
 
@@ -637,17 +700,91 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRolActionPerformed
 
+    private void nombretxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombretxtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nombretxtActionPerformed
+
+    private void reftxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reftxtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_reftxtActionPerformed
+
+    private void addProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addProductActionPerformed
+        String nombre = nombretxt.getText();
+        long cantidad = Long.parseLong(reftxt.getText());
+        String referencia = reftxt.getText();
+        
+        JSONParser parser = new JSONParser();
+
+        try {
+            // Leer el archivo JSON existente
+            Object data = parser.parse(new FileReader("db/inventario.json"));
+            JSONObject jsonObject = (JSONObject) data;
+
+            // Obtener la lista de productos existentes
+            JSONArray productos = (JSONArray) jsonObject.get("Productos");
+
+            // Generar un nuevo ID para el producto
+            long nuevoId = generarNuevoId(productos);
+
+            // Crear un nuevo objeto JSON para el producto
+            JSONObject nuevoProducto = new JSONObject();
+            nuevoProducto.put("id", nuevoId);
+            nuevoProducto.put("nombre", nombre);
+            nuevoProducto.put("cantidad", cantidad);
+            nuevoProducto.put("ref", referencia);
+
+            // Agregar el nuevo producto a la lista de productos
+            productos.add(nuevoProducto);
+
+            // Actualizar el archivo JSON con la nueva lista de productos
+            jsonObject.put("Productos", productos);
+
+            FileWriter fileWriter = new FileWriter("db/inventario.json");
+            fileWriter.write(jsonObject.toJSONString());
+            fileWriter.flush();
+            fileWriter.close();
+
+            // Actualizar la tabla con los datos actualizados
+            infotable();
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private long generarNuevoId(JSONArray productos) {
+        // Encontrar el ID más alto actualmente en uso
+        long maxId = 0;
+        for (Object p : productos) {
+            JSONObject producto = (JSONObject) p;
+            long id = (long) producto.get("id");
+            if (id > maxId) {
+                maxId = id;
+            }
+        }
+
+        // Generar un nuevo ID sumando 1 al ID más alto encontrado
+        return maxId + 1;
+    }//GEN-LAST:event_addProductActionPerformed
+
+    private void cantidadtxt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cantidadtxt1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cantidadtxt1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MenuPlegable;
     private javax.swing.JPanel Paginas;
+    private principal.MyButton addProduct;
     private javax.swing.JLabel btnAddProduct;
     private javax.swing.JLabel btnInventario;
     private javax.swing.JLabel btnPerfiles;
     private javax.swing.JLabel btnVentas;
+    private principal.MyTextField cantidadtxt1;
     private javax.swing.JButton jButton1;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -661,13 +798,14 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuItem jMenuItem1;
@@ -680,10 +818,12 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator5;
     private principal.MyButton myButton1;
     private principal.MyTable myTableP;
+    private principal.MyTextField nombretxt;
     private javax.swing.JPanel pnlAddProduct;
     private javax.swing.JPanel pnlInventario;
     private javax.swing.JPanel pnlPerfiles;
     private javax.swing.JPanel pnlVentas;
+    private principal.MyTextField reftxt;
     private principal.MyTextField txtPalabra;
     private principal.MyPasswordField txtPass;
     private principal.MyPasswordField txtRepPass;
