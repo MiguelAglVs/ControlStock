@@ -831,3 +831,5 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private principal.MyTextField txtUsuario;
     // End of variables declaration//GEN-END:variables
 }
+
+//hola
