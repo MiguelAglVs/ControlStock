@@ -1,1 +1,1 @@
-{"Productos":[{"ref":"456","estado":"oculto","id":2,"cantidad":4,"nombre":"producto2"}]}
+{"Productos":[{"ref":"234567","estado":"visible","id":1,"cantidad":80,"nombre":"producto1","cantidadmin":1,"cantidadmax":100},{"ref":"345678","estado":"visible","id":2,"cantidad":40,"nombre":"producto2","cantidadmin":1,"cantidadmax":100}]}

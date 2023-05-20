@@ -16,6 +16,7 @@ import login.Login;
 
 import desplazable.Desface;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -975,11 +976,20 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
             String filaNombre = myTableP.getValueAt(i, 1).toString();
             String filaRef = myTableP.getValueAt(i, 2).toString();
             String filaCantidadString = myTableP.getValueAt(i, 3).toString();
+            JSONObject datosJSON = obtenerDatosDesdeJSON(i);
 
             // Validar si el ID y la cantidad son números válidos
             try {
                 long filaId = Long.parseLong(filaIdString);
                 long filaCantidad = Long.parseLong(filaCantidadString);
+                String estado = datosJSON.get("estado").toString(); // Obtener el estado desde el JSON
+                long cantidadMin = Long.parseLong(datosJSON.get("cantidadmin").toString()); // Obtener la cantidad mínima desde el JSON
+                long cantidadMax = Long.parseLong(datosJSON.get("cantidadmax").toString()); // Obtener la cantidad máxima desde el JSON
+
+                // Si es la fila que se está editando y el estado actual es "oculto", cambiarlo a "visible"
+                if (i == fila && "oculto".equals(estado)) {
+                    estado = "visible";
+                }
 
                 // Crear un objeto JSON para el producto
                 JSONObject producto = new JSONObject();
@@ -987,6 +997,9 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 producto.put("nombre", filaNombre);
                 producto.put("ref", filaRef);
                 producto.put("cantidad", filaCantidad);
+                producto.put("estado", estado); // Agregar el estado al objeto JSON
+                producto.put("cantidadmin", cantidadMin); // Agregar la cantidad mínima al objeto JSON
+                producto.put("cantidadmax", cantidadMax); // Agregar la cantidad máxima al objeto JSON
 
                 // Agregar el producto al array de productos
                 productos.add(producto);
@@ -995,12 +1008,6 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 System.out.println("Error en la fila " + i + ": El ID o la cantidad no son números válidos");
             }
         }
-
-        // Actualizar el objeto JSON correspondiente a la fila seleccionada
-        JSONObject productoSeleccionado = (JSONObject) productos.get(fila);
-        productoSeleccionado.put("nombre", nombre);
-        productoSeleccionado.put("ref", ref);
-        productoSeleccionado.put("cantidad", cantidad);
 
         // Crear un objeto JSON que contiene el array de productos
         JSONObject jsonObject = new JSONObject();
@@ -1013,6 +1020,22 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private JSONObject obtenerDatosDesdeJSON(int fila) {
+        // Leer el archivo JSON y obtener los datos del producto en la fila específica
+        JSONParser parser = new JSONParser();
+        try (FileReader reader = new FileReader("db/inventario.json")) {
+            JSONObject jsonObject = (JSONObject) parser.parse(reader);
+            JSONArray productos = (JSONArray) jsonObject.get("Productos");
+            JSONObject producto = (JSONObject) productos.get(fila);
+
+            return producto;
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+
+        return null; // Valor predeterminado si no se puede obtener el objeto JSON
     }//GEN-LAST:event_btneditarActionPerformed
 
     private void btneliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminarActionPerformed
