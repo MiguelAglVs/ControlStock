@@ -1,11 +1,14 @@
 package login;
 
+import clases.GestorArchivo;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import principal.*;
 
@@ -258,47 +261,55 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_myButton2ActionPerformed
 
     private void myButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton3ActionPerformed
-        String archivo = "usuarios.csv";
+        String archivo = "db/usuarios.csv";
         String usuario = txtUsuario.getText();
         String contrasena = txtContrasena.getText();
 
         if (usuario.isEmpty() || contrasena.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Debe ingresar usuario y contraseña", "Oops! algo salio mal", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Debe ingresar usuario y contraseña", "Oops! algo salió mal", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;
             boolean usuarioEncontrado = false;
-            int intentos = 0; // variable contador de intentos
             while ((linea = br.readLine()) != null) {
                 String[] campos = linea.split(",");
                 int id = Integer.parseInt(campos[0]);
                 String usuarioArchivo = campos[1];
                 String contrasenaArchivo = campos[2];
-                String rol = campos[3];
+                String rol = campos[4];
 
-                if (usuarioArchivo.equalsIgnoreCase(usuario)) {
+                if (usuarioArchivo.equals(usuario)) { // Comparación sensible a mayúsculas y minúsculas
                     usuarioEncontrado = true;
-                    // Encriptar la contraseña ingresada por el usuario
-                    String contrasenaEncriptada = null;
-                    try {
-                        MessageDigest md = MessageDigest.getInstance("SHA-256");
-                        byte[] hash = md.digest(contrasena.getBytes());
-                        StringBuilder sb = new StringBuilder();
-                        for (byte b : hash) {
-                            sb.append(String.format("%02x", b));
+                    boolean contrasenaCorrecta = false;
+
+                    // Verificar si el usuario es "admin" para no encriptar la contraseña
+                    if (usuario.equals("admin")) {
+                        contrasenaCorrecta = contrasenaArchivo.equals(contrasena);
+                    } else {
+                        // Encriptar la contraseña ingresada por el usuario
+                        String contrasenaEncriptada = null;
+                        try {
+                            MessageDigest md = MessageDigest.getInstance("SHA-256");
+                            byte[] hash = md.digest(contrasena.getBytes());
+                            StringBuilder sb = new StringBuilder();
+                            for (byte b : hash) {
+                                sb.append(String.format("%02x", b));
+                            }
+                            contrasenaEncriptada = sb.toString();
+                        } catch (NoSuchAlgorithmException e) {
+                            System.out.println("Error al encriptar la contraseña: " + e.getMessage());
+                            return;
                         }
-                        contrasenaEncriptada = sb.toString();
-                    } catch (NoSuchAlgorithmException e) {
-                        System.out.println("Error al encriptar la contraseña: " + e.getMessage());
-                        return;
+                        contrasenaCorrecta = contrasenaArchivo.equals(contrasenaEncriptada);
                     }
-                    if (contrasenaArchivo.equals(contrasenaEncriptada)) {
+
+                    if (contrasenaCorrecta) {
                         if (rol.equals("Administrador")) {
-                            MenuPrincipalAdmin ventanaPrincipal = new MenuPrincipalAdmin();
-                            ventanaPrincipal.setVisible(true);
-                            ventanaPrincipal.setLocationRelativeTo(null);
+                            MenuPrincipalAdmin ventanaPrincipalAdmin = new MenuPrincipalAdmin();
+                            ventanaPrincipalAdmin.setVisible(true);
+                            ventanaPrincipalAdmin.setLocationRelativeTo(null);
                         } else {
                             MenuPrincipalVendedor ventanaPrincipal = new MenuPrincipalVendedor();
                             ventanaPrincipal.setVisible(true);
@@ -306,16 +317,11 @@ public class Login extends javax.swing.JFrame {
                         }
                         this.setVisible(false);
                         return;
-                    } else {
-                        intentos++;
                     }
                 }
             }
             if (!usuarioEncontrado) {
                 JOptionPane.showMessageDialog(null, "Usuario no encontrado.", "Oops! algo salió mal", JOptionPane.ERROR_MESSAGE);
-            } else if (intentos > 3) {
-                JOptionPane.showMessageDialog(null, "Ha superado el número máximo de intentos. La aplicación se cerrará.", "Oops! algo salió mal", JOptionPane.ERROR_MESSAGE);
-                System.exit(0);
             } else {
                 JOptionPane.showMessageDialog(null, "Contraseña incorrecta", "Oops! algo salió mal", JOptionPane.ERROR_MESSAGE);
             }

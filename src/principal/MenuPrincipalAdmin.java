@@ -1,16 +1,26 @@
 package principal;
 
-import desplazable.Desface;
 import java.awt.event.ActionEvent;
+import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import javax.swing.JOptionPane;
-import javax.swing.Timer;
-import clases.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+
+import clases.*;
 import login.Login;
+
+import desplazable.Desface;
+import java.io.File;
+import java.io.FileWriter;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class MenuPrincipalAdmin extends javax.swing.JFrame {
 
@@ -18,8 +28,61 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private Timer timer;
 
     public MenuPrincipalAdmin() {
-        desplace = new Desface();
         initComponents();
+        infotable();
+    }
+
+    private void infotable() {
+        JSONParser parser = new JSONParser();
+
+        try {
+            Object data = parser.parse(new FileReader("db/inventario.json"));
+
+            Object[][] array = null;
+            JSONObject jsonObject = (JSONObject) data;
+
+            JSONArray productos = (JSONArray) jsonObject.get("Productos");
+
+            int cont = 0;
+
+            // Contar la cantidad de productos visibles
+            long cantidadProductosVisibles = productos.stream()
+                    .filter(p -> "visible".equals(((JSONObject) p).get("estado")))
+                    .count();
+
+            array = new Object[(int) cantidadProductosVisibles][4];
+
+            for (Object p : productos) {
+                JSONObject producto = (JSONObject) p;
+
+                String estado = (String) producto.get("estado");
+
+                // Mostrar solo los productos con estado "visible"
+                if ("visible".equals(estado)) {
+                    long id = (long) producto.get("id");
+                    String nombre = (String) producto.get("nombre");
+                    long cantidad = (long) producto.get("cantidad");
+                    String ref = (String) producto.get("ref");
+
+                    array[cont][0] = id;
+                    array[cont][1] = nombre;
+                    array[cont][2] = ref;
+                    array[cont][3] = cantidad;
+
+                    cont++;
+                }
+            }
+
+            myTableP.setModel(new javax.swing.table.DefaultTableModel(
+                    array,
+                    new String[]{
+                        "Id", "Nombre", "Referencia", "Cantidad"
+                    }
+            ));
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -32,34 +95,42 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         jCheckBoxMenuItem2 = new javax.swing.JCheckBoxMenuItem();
         jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jButton1 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         MenuPlegable = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        btnHome = new javax.swing.JLabel();
         btnInventario = new javax.swing.JLabel();
         btnAddProduct = new javax.swing.JLabel();
         btnVentas = new javax.swing.JLabel();
         btnPerfiles = new javax.swing.JLabel();
         Paginas = new javax.swing.JPanel();
-        pnlHome = new javax.swing.JPanel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
         pnlInventario = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
         jSeparator5 = new javax.swing.JSeparator();
         jLabel22 = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        myTableP = new principal.MyTable();
+        btneditar = new principal.MyButton();
+        btneliminar = new principal.MyButton();
+        btnrecuperar = new principal.MyButton();
         pnlAddProduct = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jSeparator4 = new javax.swing.JSeparator();
         jLabel19 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        nombretxt = new principal.MyTextField();
+        jLabel9 = new javax.swing.JLabel();
+        reftxt = new principal.MyTextField();
+        jLabel10 = new javax.swing.JLabel();
+        addProduct = new principal.MyButton();
+        cantidadtxt = new principal.MyTextField();
+        cantidadmaxtxt = new principal.MyTextField();
+        jLabel23 = new javax.swing.JLabel();
+        cantidadmintxt = new principal.MyTextField();
+        jLabel24 = new javax.swing.JLabel();
         pnlVentas = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
@@ -72,7 +143,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         txtRol = new principal.MyComboBox();
-        myButton1 = new principal.MyButton();
+        creraUsu = new principal.MyButton();
         txtUsuario = new principal.MyTextField();
         txtPalabra = new principal.MyTextField();
         jLabel7 = new javax.swing.JLabel();
@@ -98,11 +169,14 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
 
         jMenu2.setText("jMenu2");
 
+        jButton1.setText("jButton1");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         MenuPlegable.setBackground(new java.awt.Color(78, 115, 223));
+        MenuPlegable.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel2.setFont(new java.awt.Font("Calibri", 1, 20)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -119,6 +193,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 jLabel2MouseClicked(evt);
             }
         });
+        MenuPlegable.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 180, 50));
 
         jLabel1.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -134,27 +209,9 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 jLabel1MouseClicked(evt);
             }
         });
+        MenuPlegable.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 410, 180, 50));
 
-        btnHome.setBackground(new java.awt.Color(59, 89, 152));
-        btnHome.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
-        btnHome.setForeground(new java.awt.Color(255, 255, 255));
-        btnHome.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        btnHome.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/home.png"))); // NOI18N
-        btnHome.setText("Inicio");
-        btnHome.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 10));
-        btnHome.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnHome.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        btnHome.setIconTextGap(50);
-        btnHome.setName(""); // NOI18N
-        btnHome.setOpaque(true);
-        btnHome.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        btnHome.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnHomeMouseClicked(evt);
-            }
-        });
-
-        btnInventario.setBackground(new java.awt.Color(78, 115, 223));
+        btnInventario.setBackground(new java.awt.Color(59, 89, 152));
         btnInventario.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
         btnInventario.setForeground(new java.awt.Color(255, 255, 255));
         btnInventario.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
@@ -171,6 +228,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 btnInventarioMouseClicked(evt);
             }
         });
+        MenuPlegable.add(btnInventario, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 56, 180, 50));
 
         btnAddProduct.setBackground(new java.awt.Color(78, 115, 223));
         btnAddProduct.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -189,6 +247,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 btnAddProductMouseClicked(evt);
             }
         });
+        MenuPlegable.add(btnAddProduct, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 107, 180, 50));
 
         btnVentas.setBackground(new java.awt.Color(78, 115, 223));
         btnVentas.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -207,6 +266,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 btnVentasMouseClicked(evt);
             }
         });
+        MenuPlegable.add(btnVentas, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 158, 180, 50));
 
         btnPerfiles.setBackground(new java.awt.Color(78, 115, 223));
         btnPerfiles.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -225,70 +285,11 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 btnPerfilesMouseClicked(evt);
             }
         });
-
-        javax.swing.GroupLayout MenuPlegableLayout = new javax.swing.GroupLayout(MenuPlegable);
-        MenuPlegable.setLayout(MenuPlegableLayout);
-        MenuPlegableLayout.setHorizontalGroup(
-            MenuPlegableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnHome, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnAddProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnPerfiles, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
-        MenuPlegableLayout.setVerticalGroup(
-            MenuPlegableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(MenuPlegableLayout.createSequentialGroup()
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(btnHome, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(btnInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(btnAddProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(btnVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(btnPerfiles, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(110, 110, 110)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+        MenuPlegable.add(btnPerfiles, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 209, 180, 50));
 
         jPanel3.add(MenuPlegable, new org.netbeans.lib.awtextra.AbsoluteConstraints(-130, 0, -1, -1));
 
         Paginas.setLayout(new java.awt.CardLayout());
-
-        pnlHome.setBackground(new java.awt.Color(251, 252, 253));
-        pnlHome.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jSeparator1.setBackground(new java.awt.Color(78, 115, 223));
-        jSeparator1.setForeground(new java.awt.Color(78, 115, 223));
-        pnlHome.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 760, 10));
-
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(58, 59, 69));
-        jLabel8.setText("Dashboard");
-        jLabel8.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        jLabel8.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
-        pnlHome.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
-
-        jLabel9.setForeground(new java.awt.Color(58, 59, 69));
-        jLabel9.setText("Home  /");
-        pnlHome.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 30, -1, -1));
-
-        jLabel10.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel10.setText("Dashboard ");
-        pnlHome.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 30, -1, -1));
-
-        jLabel23.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        jLabel23.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel23.setText("Panel 1");
-        jLabel23.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        pnlHome.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 210, 170, 60));
-
-        Paginas.add(pnlHome, "card2");
 
         pnlInventario.setBackground(new java.awt.Color(251, 252, 253));
         pnlInventario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -312,11 +313,60 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         jLabel22.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         pnlInventario.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
 
-        jLabel24.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        jLabel24.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel24.setText("Panel 2");
-        jLabel24.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        pnlInventario.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 210, 170, 60));
+        myTableP.setAutoCreateRowSorter(true);
+        myTableP.setBackground(new java.awt.Color(255, 255, 255));
+        myTableP.setForeground(new java.awt.Color(0, 0, 0));
+        myTableP.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(myTableP);
+
+        pnlInventario.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 760, 310));
+
+        btneditar.setForeground(new java.awt.Color(255, 255, 255));
+        btneditar.setText("Editar");
+        btneditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btneditarActionPerformed(evt);
+            }
+        });
+        pnlInventario.add(btneditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 390, 240, 50));
+
+        btneliminar.setBackground(new java.awt.Color(255, 51, 51));
+        btneliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btneliminar.setText("Eliminar");
+        btneliminar.setBorderColor(new java.awt.Color(255, 51, 51));
+        btneliminar.setColor(new java.awt.Color(255, 51, 51));
+        btneliminar.setColorClick(new java.awt.Color(255, 0, 0));
+        btneliminar.setColorOver(new java.awt.Color(204, 0, 0));
+        btneliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btneliminarActionPerformed(evt);
+            }
+        });
+        pnlInventario.add(btneliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 390, 240, 50));
+
+        btnrecuperar.setBackground(new java.awt.Color(0, 204, 0));
+        btnrecuperar.setForeground(new java.awt.Color(255, 255, 255));
+        btnrecuperar.setText("Recuperar");
+        btnrecuperar.setBorderColor(new java.awt.Color(0, 204, 0));
+        btnrecuperar.setColor(new java.awt.Color(0, 204, 0));
+        btnrecuperar.setColorClick(new java.awt.Color(0, 153, 0));
+        btnrecuperar.setColorOver(new java.awt.Color(0, 153, 0));
+        btnrecuperar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnrecuperarActionPerformed(evt);
+            }
+        });
+        pnlInventario.add(btnrecuperar, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 390, 240, 50));
 
         Paginas.add(pnlInventario, "card3");
 
@@ -342,11 +392,79 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         jLabel19.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         pnlAddProduct.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
 
-        jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        jLabel25.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel25.setText("Panel 3");
-        jLabel25.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        pnlAddProduct.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 210, 170, 60));
+        jLabel8.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel8.setText("Nombre:");
+        pnlAddProduct.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, -1, -1));
+
+        nombretxt.setBackground(new java.awt.Color(251, 252, 253));
+        nombretxt.setForeground(new java.awt.Color(58, 59, 69));
+        nombretxt.setBorderColor(new java.awt.Color(209, 211, 225));
+        nombretxt.setCaretColor(new java.awt.Color(187, 187, 187));
+        nombretxt.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        nombretxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nombretxtActionPerformed(evt);
+            }
+        });
+        pnlAddProduct.add(nombretxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 170, 270, 50));
+
+        jLabel9.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel9.setText("Cantidad maxima:");
+        pnlAddProduct.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 230, -1, -1));
+
+        reftxt.setBackground(new java.awt.Color(251, 252, 253));
+        reftxt.setForeground(new java.awt.Color(58, 59, 69));
+        reftxt.setBorderColor(new java.awt.Color(209, 211, 225));
+        reftxt.setCaretColor(new java.awt.Color(187, 187, 187));
+        reftxt.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        reftxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reftxtActionPerformed(evt);
+            }
+        });
+        pnlAddProduct.add(reftxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 330, 270, 50));
+
+        jLabel10.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel10.setText("Referencia:");
+        pnlAddProduct.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 310, -1, -1));
+
+        addProduct.setForeground(new java.awt.Color(251, 252, 253));
+        addProduct.setText("Agregar");
+        addProduct.setBorderColor(new java.awt.Color(251, 252, 253));
+        addProduct.setBorderPainted(false);
+        addProduct.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addProductActionPerformed(evt);
+            }
+        });
+        pnlAddProduct.add(addProduct, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 330, 270, 50));
+
+        cantidadtxt.setBackground(new java.awt.Color(251, 252, 253));
+        cantidadtxt.setForeground(new java.awt.Color(58, 59, 69));
+        cantidadtxt.setBorderColor(new java.awt.Color(209, 211, 225));
+        cantidadtxt.setCaretColor(new java.awt.Color(187, 187, 187));
+        cantidadtxt.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        cantidadtxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cantidadtxtActionPerformed(evt);
+            }
+        });
+        pnlAddProduct.add(cantidadtxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 170, 270, 50));
+        pnlAddProduct.add(cantidadmaxtxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 250, 270, 50));
+
+        jLabel23.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel23.setText("Cantidad:");
+        pnlAddProduct.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 150, -1, -1));
+        pnlAddProduct.add(cantidadmintxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 250, 270, 50));
+
+        jLabel24.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel24.setText("Cantidad minima:");
+        pnlAddProduct.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 230, -1, -1));
 
         Paginas.add(pnlAddProduct, "card4");
 
@@ -414,16 +532,16 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         });
         pnlPerfiles.add(txtRol, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 290, 530, 50));
 
-        myButton1.setForeground(new java.awt.Color(251, 252, 253));
-        myButton1.setText("Crear");
-        myButton1.setBorderColor(new java.awt.Color(251, 252, 253));
-        myButton1.setBorderPainted(false);
-        myButton1.addActionListener(new java.awt.event.ActionListener() {
+        creraUsu.setForeground(new java.awt.Color(251, 252, 253));
+        creraUsu.setText("Crear");
+        creraUsu.setBorderColor(new java.awt.Color(251, 252, 253));
+        creraUsu.setBorderPainted(false);
+        creraUsu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                myButton1ActionPerformed(evt);
+                creraUsuActionPerformed(evt);
             }
         });
-        pnlPerfiles.add(myButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 350, 560, 50));
+        pnlPerfiles.add(creraUsu, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 350, 560, 50));
 
         txtUsuario.setBackground(new java.awt.Color(251, 252, 253));
         txtUsuario.setForeground(new java.awt.Color(58, 59, 69));
@@ -530,27 +648,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_jLabel1MouseClicked
 
-    private void btnHomeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnHomeMouseClicked
-        btnHome.setBackground(new java.awt.Color(59, 89, 152));
-        pnlHome.setVisible(true);
-
-        btnInventario.setBackground(new java.awt.Color(78, 115, 223));
-        pnlInventario.setVisible(false);
-
-        btnAddProduct.setBackground(new java.awt.Color(78, 115, 223));
-        pnlAddProduct.setVisible(false);
-
-        btnVentas.setBackground(new java.awt.Color(78, 115, 223));
-        pnlVentas.setVisible(false);
-
-        btnPerfiles.setBackground(new java.awt.Color(78, 115, 223));
-        pnlPerfiles.setVisible(false);
-    }//GEN-LAST:event_btnHomeMouseClicked
-
     private void btnInventarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnInventarioMouseClicked
-        btnHome.setBackground(new java.awt.Color(78, 115, 223));
-        pnlHome.setVisible(false);
-
         btnInventario.setBackground(new java.awt.Color(59, 89, 152));
         pnlInventario.setVisible(true);
 
@@ -565,9 +663,6 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     }//GEN-LAST:event_btnInventarioMouseClicked
 
     private void btnAddProductMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAddProductMouseClicked
-        btnHome.setBackground(new java.awt.Color(78, 115, 223));
-        pnlHome.setVisible(false);
-
         btnInventario.setBackground(new java.awt.Color(78, 115, 223));
         pnlInventario.setVisible(false);
 
@@ -582,9 +677,6 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddProductMouseClicked
 
     private void btnVentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVentasMouseClicked
-        btnHome.setBackground(new java.awt.Color(78, 115, 223));
-        pnlHome.setVisible(false);
-
         btnInventario.setBackground(new java.awt.Color(78, 115, 223));
         pnlInventario.setVisible(false);
 
@@ -599,9 +691,6 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     }//GEN-LAST:event_btnVentasMouseClicked
 
     private void btnPerfilesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnPerfilesMouseClicked
-        btnHome.setBackground(new java.awt.Color(78, 115, 223));
-        pnlHome.setVisible(false);
-
         btnInventario.setBackground(new java.awt.Color(78, 115, 223));
         pnlInventario.setVisible(false);
 
@@ -623,12 +712,25 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtUsuarioActionPerformed
 
-    private void myButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton1ActionPerformed
+    private void creraUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_creraUsuActionPerformed
         String usuario = txtUsuario.getText();
         String palabra = txtPalabra.getText();
         String contrasena = new String(txtPass.getPassword());
         String repContrasena = new String(txtRepPass.getPassword());
         String rol = (String) txtRol.getSelectedItem();
+
+        String nombreUsuario = txtUsuario.getText();
+        GestorArchivo gestorArchivo = new GestorArchivo("db/usuarios.csv");
+
+        try {
+            // Verificar si el usuario ya existe
+            if (gestorArchivo.existeUsuario(nombreUsuario)) {
+                JOptionPane.showMessageDialog(this, "El nombre de usuario ya está en uso", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MenuPrincipalAdmin.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         // Encriptar la contraseña
         String contrasenaEncriptada = null;
@@ -655,8 +757,13 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
             return;
         }
 
+        // Validar la contraseña
+        if (contrasena.length() < 6 || !contrasena.matches(".*[A-Z].*") || !contrasena.matches(".*[a-z].*") || !contrasena.matches(".*\\d.*")) {
+            JOptionPane.showMessageDialog(this, "La contraseña no cumple con los requisitos:\n-Tener al menos 6 caracteres.\n-Incluir una letra mayúscula.\n-Incluiruna letra minúscula\n-Incluir un dígito numérico.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         Usuario nuevoUsuario = new Usuario(0, usuario, contrasenaEncriptada, palabra, rol);
-        GestorArchivo gestorArchivo = new GestorArchivo("usuarios.csv");
         try {
             gestorArchivo.escribirUsuario(nuevoUsuario);
         } catch (IOException ex) {
@@ -670,20 +777,379 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         txtPass.setText("");
         txtRepPass.setText("");
         txtRol.setSelectedIndex(0);
-    }//GEN-LAST:event_myButton1ActionPerformed
+        // Método para validar la contraseña
+    }//GEN-LAST:event_creraUsuActionPerformed
+
+    private boolean validarContrasena(String contrasena) {
+        // Verificar longitud mínima de 6 caracteres
+        if (contrasena.length() < 6) {
+            return false;
+        }
+
+        // Verificar si contiene al menos una letra mayúscula
+        if (!contrasena.matches(".*[A-Z].*")) {
+            return false;
+        }
+
+        // Verificar si contiene al menos una letra minúscula
+        if (!contrasena.matches(".*[a-z].*")) {
+            return false;
+        }
+
+        // Verificar si contiene al menos un dígito numérico
+        if (!contrasena.matches(".*\\d.*")) {
+            return false;
+        }
+
+        // Verificar si contiene al menos un carácter especial (opcional)
+        if (!contrasena.matches(".*[!@#$%^&*()-_=+{};:,<.>].*")) {
+            return false;
+        }
+
+        return true;
+    }
 
     private void txtRolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRolActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRolActionPerformed
 
+    private void nombretxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombretxtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nombretxtActionPerformed
+
+    private void reftxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reftxtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_reftxtActionPerformed
+
+    private void addProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addProductActionPerformed
+        String nombre = nombretxt.getText();
+        String cantidadText = cantidadtxt.getText();
+        String cantidadminText = cantidadmintxt.getText();
+        String cantidadmaxText = cantidadmaxtxt.getText();
+        String referencia = reftxt.getText();
+
+        JSONParser parser = new JSONParser();
+
+        if (nombre.isEmpty() || cantidadText.isEmpty() || referencia.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Debe completar todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            try {
+                long cantidad;
+                long cantidadmin;
+                long cantidadmax;
+
+                if (cantidadText.equals("")) {
+                    cantidad = 0; // Establecer un valor predeterminado si el campo está vacío
+                } else {
+                    cantidad = Long.parseLong(cantidadText);
+                }
+
+                if (cantidadminText.equals("")) {
+                    cantidadmin = 0; // Establecer un valor predeterminado si el campo está vacío
+                } else {
+                    cantidadmin = Long.parseLong(cantidadminText);
+                }
+
+                if (cantidadmaxText.equals("")) {
+                    cantidadmax = 0; // Establecer un valor predeterminado si el campo está vacío
+                } else {
+                    cantidadmax = Long.parseLong(cantidadmaxText);
+                }
+
+                File file = new File("db/inventario.json");
+                JSONObject jsonObject;
+                JSONArray productos;
+
+                if (file.exists() && file.length() > 0) {
+                    // Leer el archivo JSON existente
+                    Object data = parser.parse(new FileReader(file));
+                    jsonObject = (JSONObject) data;
+                    productos = (JSONArray) jsonObject.get("Productos");
+                } else {
+                    // Crear un nuevo archivo JSON
+                    jsonObject = new JSONObject();
+                    productos = new JSONArray();
+                }
+
+                // Generar un nuevo ID para el producto
+                long nuevoId = generarNuevoId(productos);
+
+                // Crear un nuevo objeto JSON para el producto
+                JSONObject nuevoProducto = new JSONObject();
+                nuevoProducto.put("id", nuevoId);
+                nuevoProducto.put("nombre", nombre);
+                nuevoProducto.put("cantidad", cantidad);
+                nuevoProducto.put("cantidadmin", cantidadmin);
+                nuevoProducto.put("cantidadmax", cantidadmax);
+                nuevoProducto.put("ref", referencia);
+                nuevoProducto.put("estado", "visible");
+
+                // Agregar el nuevo producto a la lista de productos
+                productos.add(nuevoProducto);
+
+                // Actualizar el objeto JSON con la nueva lista de productos
+                jsonObject.put("Productos", productos);
+
+                FileWriter fileWriter = new FileWriter(file);
+                fileWriter.write(jsonObject.toJSONString());
+                fileWriter.flush();
+                fileWriter.close();
+
+                infotable();
+
+                nombretxt.setText("");
+                cantidadtxt.setText("");
+                reftxt.setText("");
+                cantidadmintxt.setText("");
+                cantidadmaxtxt.setText("");
+                JOptionPane.showMessageDialog(null, "Producto agregado exitosamente", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException | ParseException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "La cantidad, cantidad mínima y cantidad máxima deben ser valores numéricos", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private long generarNuevoId(JSONArray productos) {
+        // Encontrar el ID más alto actualmente en uso
+        long maxId = 0;
+        for (Object p : productos) {
+            JSONObject producto = (JSONObject) p;
+            long id = (long) producto.get("id");
+            if (id > maxId) {
+                maxId = id;
+            }
+        }
+
+        // Generar un nuevo ID sumando 1 al ID más alto encontrado
+        return maxId + 1;
+    }//GEN-LAST:event_addProductActionPerformed
+
+    private void cantidadtxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cantidadtxtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cantidadtxtActionPerformed
+
+    private void btneditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneditarActionPerformed
+        // Obtener el índice de la fila seleccionada
+        int filaSeleccionada = myTableP.getSelectedRow();
+
+        // Verificar si hay una fila seleccionada
+        if (filaSeleccionada != -1) {
+            // Obtener los valores de la fila seleccionada
+            String idString = myTableP.getValueAt(filaSeleccionada, 0).toString();
+            String nombre = myTableP.getValueAt(filaSeleccionada, 1).toString();
+            String ref = myTableP.getValueAt(filaSeleccionada, 2).toString();
+            String cantidadString = myTableP.getValueAt(filaSeleccionada, 3).toString();
+
+            // Validar si el ID y la cantidad son números válidos
+            try {
+                long cantidad = Long.parseLong(cantidadString);
+
+                // Verificar si se intenta editar el ID
+                if (!idString.equals(Long.toString(filaSeleccionada))) {
+                    // Actualizar el archivo JSON con los nuevos valores
+                    actualizarJSON(filaSeleccionada, nombre, ref, cantidad);
+                    JOptionPane.showMessageDialog(null, "La edición de los productos fue exitosa");
+                } else {
+                    JOptionPane.showMessageDialog(null, "No se puede editar el ID en la fila " + (filaSeleccionada + 1));
+                }
+            } catch (NumberFormatException ex) {
+                // Manejar el caso cuando la cantidad no es un número válido
+                System.out.println("Error en la fila " + filaSeleccionada + ": La cantidad no es un número válido");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, seleccione una fila para editar.");
+        }
+
+        myTableP.clearSelection();
+    }
+
+    private void actualizarJSON(int fila, String nombre, String ref, long cantidad) {
+        JSONArray productos = new JSONArray();
+
+        // Recorrer todas las filas de la tabla
+        for (int i = 0; i < myTableP.getRowCount(); i++) {
+            // Obtener los valores de la tabla
+            String filaIdString = myTableP.getValueAt(i, 0).toString();
+            String filaNombre = myTableP.getValueAt(i, 1).toString();
+            String filaRef = myTableP.getValueAt(i, 2).toString();
+            String filaCantidadString = myTableP.getValueAt(i, 3).toString();
+
+            // Validar si el ID y la cantidad son números válidos
+            try {
+                long filaId = Long.parseLong(filaIdString);
+                long filaCantidad = Long.parseLong(filaCantidadString);
+
+                // Crear un objeto JSON para el producto
+                JSONObject producto = new JSONObject();
+                producto.put("id", filaId);
+                producto.put("nombre", filaNombre);
+                producto.put("ref", filaRef);
+                producto.put("cantidad", filaCantidad);
+
+                // Agregar el producto al array de productos
+                productos.add(producto);
+            } catch (NumberFormatException ex) {
+                // Manejar el caso cuando el ID o la cantidad no son números válidos
+                System.out.println("Error en la fila " + i + ": El ID o la cantidad no son números válidos");
+            }
+        }
+
+        // Actualizar el objeto JSON correspondiente a la fila seleccionada
+        JSONObject productoSeleccionado = (JSONObject) productos.get(fila);
+        productoSeleccionado.put("nombre", nombre);
+        productoSeleccionado.put("ref", ref);
+        productoSeleccionado.put("cantidad", cantidad);
+
+        // Crear un objeto JSON que contiene el array de productos
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Productos", productos);
+
+        // Escribir el objeto JSON en el archivo
+        try (FileWriter file = new FileWriter("db/inventario.json")) {
+            file.write(jsonObject.toJSONString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btneditarActionPerformed
+
+    private void btneliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminarActionPerformed
+        // Obtener el índice de la fila seleccionada
+        int filaSeleccionada = myTableP.getSelectedRow();
+
+        // Verificar si hay una fila seleccionada
+        if (filaSeleccionada != -1) {
+            // Obtener el ID y el nombre del producto seleccionado
+            String idString = myTableP.getValueAt(filaSeleccionada, 0).toString();
+            String nombre = myTableP.getValueAt(filaSeleccionada, 1).toString();
+
+            // Pedir confirmación al usuario
+            int confirmacion = JOptionPane.showConfirmDialog(null, "¿Está seguro de eliminar el producto " + nombre + "?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                // Verificar si el ID es un número válido
+                try {
+                    long id = Long.parseLong(idString);
+
+                    // Leer el archivo JSON
+                    JSONParser parser = new JSONParser();
+                    try (FileReader reader = new FileReader("db/inventario.json")) {
+                        Object data = parser.parse(reader);
+                        JSONObject jsonObject = (JSONObject) data;
+                        JSONArray productos = (JSONArray) jsonObject.get("Productos");
+
+                        // Buscar el producto por su ID
+                        for (Object p : productos) {
+                            JSONObject producto = (JSONObject) p;
+                            long productId = (long) producto.get("id");
+
+                            if (productId == id) {
+                                // Actualizar el estado del producto a "oculto"
+                                producto.put("estado", "oculto");
+                                break;
+                            }
+                        }
+
+                        // Actualizar el objeto JSON con la lista de productos modificada
+                        jsonObject.put("Productos", productos);
+
+                        // Escribir los cambios de vuelta al archivo JSON
+                        try (FileWriter file = new FileWriter("db/inventario.json")) {
+                            file.write(jsonObject.toJSONString());
+                            file.flush();
+                        }
+
+                        // Actualizar la tabla con la nueva información
+                        infotable();
+
+                        JOptionPane.showMessageDialog(null, "Producto eliminado correctamente", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (IOException | ParseException e) {
+                        e.printStackTrace();
+                    }
+                } catch (NumberFormatException ex) {
+                    // Manejar el caso cuando el ID no es un número válido
+                    System.out.println("Error en la fila " + filaSeleccionada + ": El ID no es un número válido");
+                }
+            } else {
+                // El usuario canceló el cambio de estado
+                JOptionPane.showMessageDialog(null, "Eliminacion cancelada", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, seleccione el producto a eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        myTableP.clearSelection();
+    }//GEN-LAST:event_btneliminarActionPerformed
+
+    private void btnrecuperarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnrecuperarActionPerformed
+        JSONParser parser = new JSONParser();
+
+        try {
+            Object data = parser.parse(new FileReader("db/inventario.json"));
+
+            Object[][] array = null;
+            JSONObject jsonObject = (JSONObject) data;
+
+            JSONArray productos = (JSONArray) jsonObject.get("Productos");
+
+            int cont = 0;
+
+            // Contar la cantidad de productos visibles
+            long cantidadProductosVisibles = productos.stream()
+                    .filter(p -> "oculto".equals(((JSONObject) p).get("estado")))
+                    .count();
+
+            array = new Object[(int) cantidadProductosVisibles][4];
+
+            for (Object p : productos) {
+                JSONObject producto = (JSONObject) p;
+
+                String estado = (String) producto.get("estado");
+
+                // Mostrar solo los productos con estado "visible"
+                if ("oculto".equals(estado)) {
+                    long id = (long) producto.get("id");
+                    String nombre = (String) producto.get("nombre");
+                    long cantidad = (long) producto.get("cantidad");
+                    String ref = (String) producto.get("ref");
+
+                    array[cont][0] = id;
+                    array[cont][1] = nombre;
+                    array[cont][2] = ref;
+                    array[cont][3] = cantidad;
+
+                    cont++;
+                }
+            }
+
+            myTableP.setModel(new javax.swing.table.DefaultTableModel(
+                    array,
+                    new String[]{
+                        "Id", "Nombre", "Referencia", "Cantidad"
+                    }
+            ));
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnrecuperarActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MenuPlegable;
     private javax.swing.JPanel Paginas;
+    private principal.MyButton addProduct;
     private javax.swing.JLabel btnAddProduct;
-    private javax.swing.JLabel btnHome;
     private javax.swing.JLabel btnInventario;
     private javax.swing.JLabel btnPerfiles;
     private javax.swing.JLabel btnVentas;
+    private principal.MyButton btneditar;
+    private principal.MyButton btneliminar;
+    private principal.MyButton btnrecuperar;
+    private principal.MyTextField cantidadmaxtxt;
+    private principal.MyTextField cantidadmintxt;
+    private principal.MyTextField cantidadtxt;
+    private principal.MyButton creraUsu;
+    private javax.swing.JButton jButton1;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem2;
     private javax.swing.JLabel jLabel1;
@@ -703,7 +1169,6 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -717,17 +1182,18 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
-    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
-    private principal.MyButton myButton1;
+    private principal.MyTable myTableP;
+    private principal.MyTextField nombretxt;
     private javax.swing.JPanel pnlAddProduct;
-    private javax.swing.JPanel pnlHome;
     private javax.swing.JPanel pnlInventario;
     private javax.swing.JPanel pnlPerfiles;
     private javax.swing.JPanel pnlVentas;
+    private principal.MyTextField reftxt;
     private principal.MyTextField txtPalabra;
     private principal.MyPasswordField txtPass;
     private principal.MyPasswordField txtRepPass;
