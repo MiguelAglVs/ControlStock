@@ -32,6 +32,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private Timer timer;
 
     public MenuPrincipalAdmin() {
+        desplace = new Desface();
         initComponents();
         infotable();
         historialtable();
