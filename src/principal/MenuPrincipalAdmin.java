@@ -18,6 +18,9 @@ import desplazable.Desface;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.DefaultComboBoxModel;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -31,6 +34,8 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     public MenuPrincipalAdmin() {
         initComponents();
         infotable();
+        historialtable();
+        cargarDatosEnComboBox();
     }
 
     private void infotable() {
@@ -86,6 +91,76 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         }
     }
 
+    private void historialtable() {
+        JSONParser parser = new JSONParser();
+
+        try {
+            Object data = parser.parse(new FileReader("db/historial_ventas.json"));
+
+            Object[][] array = null;
+            JSONObject jsonObject = (JSONObject) data;
+
+            JSONArray ventas = (JSONArray) jsonObject.get("Ventas");
+
+            int cont = 0;
+            array = new Object[ventas.size()][3];
+
+            for (Object v : ventas) {
+                JSONObject venta = (JSONObject) v;
+
+                String productoNombre = (String) venta.get("productoNombre");
+                long cantidadVendida = (long) venta.get("cantidadVendida");
+                String fechaVenta = (String) venta.get("fechaVenta");
+
+                array[cont][0] = productoNombre;
+                array[cont][1] = cantidadVendida;
+                array[cont][2] = fechaVenta;
+
+                cont++;
+            }
+
+            myTableH.setModel(new javax.swing.table.DefaultTableModel(
+                    array,
+                    new String[]{
+                        "Producto", "Cantidad Vendida", "Fecha Venta"
+                    }
+            ));
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarDatosEnComboBox() {
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("Seleccionar"); // Agrega la opción "Seleccionar" al modelo
+
+        JSONParser parser = new JSONParser();
+
+        try {
+            Object data = parser.parse(new FileReader("db/inventario.json"));
+            JSONObject jsonObject = (JSONObject) data;
+            JSONArray productos = (JSONArray) jsonObject.get("Productos");
+
+            for (Object p : productos) {
+                JSONObject producto = (JSONObject) p;
+                String estado = (String) producto.get("estado");
+
+                // Mostrar solo los productos con estado "visible"
+                if ("visible".equals(estado)) {
+                    long id = (long) producto.get("id");
+                    String nombre = (String) producto.get("nombre");
+                    String item = id + " - " + nombre;
+                    model.addElement(item);
+                }
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+
+        Porductotxt.setModel(model);
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -137,7 +212,15 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
         jLabel16 = new javax.swing.JLabel();
+        Porductotxt = new principal.ComboBoxP();
+        myButton1 = new principal.MyButton();
+        txtCantidad = new principal.MyTextField();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        myTableH = new principal.MyTable();
+        jLabel25 = new javax.swing.JLabel();
         jLabel26 = new javax.swing.JLabel();
+        btneliminar1 = new principal.MyButton();
+        btneliminar2 = new principal.MyButton();
         pnlPerfiles = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -334,6 +417,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
 
         btneditar.setForeground(new java.awt.Color(255, 255, 255));
         btneditar.setText("Editar");
+        btneditar.setToolTipText("Edirae producto seleccionado (Tambien recupera el elemento seleccionado en la papelera)");
         btneditar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btneditarActionPerformed(evt);
@@ -344,6 +428,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         btneliminar.setBackground(new java.awt.Color(255, 51, 51));
         btneliminar.setForeground(new java.awt.Color(255, 255, 255));
         btneliminar.setText("Eliminar");
+        btneliminar.setToolTipText("Envia el producto seleccionado a la papelera");
         btneliminar.setBorderColor(new java.awt.Color(255, 51, 51));
         btneliminar.setColor(new java.awt.Color(255, 51, 51));
         btneliminar.setColorClick(new java.awt.Color(255, 0, 0));
@@ -355,13 +440,14 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         });
         pnlInventario.add(btneliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 390, 240, 50));
 
-        btnrecuperar.setBackground(new java.awt.Color(0, 204, 0));
+        btnrecuperar.setBackground(new java.awt.Color(153, 153, 153));
         btnrecuperar.setForeground(new java.awt.Color(255, 255, 255));
-        btnrecuperar.setText("Recuperar");
-        btnrecuperar.setBorderColor(new java.awt.Color(0, 204, 0));
-        btnrecuperar.setColor(new java.awt.Color(0, 204, 0));
-        btnrecuperar.setColorClick(new java.awt.Color(0, 153, 0));
-        btnrecuperar.setColorOver(new java.awt.Color(0, 153, 0));
+        btnrecuperar.setText("Papelera");
+        btnrecuperar.setToolTipText("Ver productos en la papelera");
+        btnrecuperar.setBorderColor(new java.awt.Color(153, 153, 153));
+        btnrecuperar.setColor(new java.awt.Color(153, 153, 153));
+        btnrecuperar.setColorClick(new java.awt.Color(153, 153, 153));
+        btnrecuperar.setColorOver(new java.awt.Color(102, 102, 102));
         btnrecuperar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnrecuperarActionPerformed(evt);
@@ -441,6 +527,41 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 addProductActionPerformed(evt);
             }
         });
+        nombretxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    addProductActionPerformed(null);
+                }
+            }
+        });
+        cantidadtxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    addProductActionPerformed(null);
+                }
+            }
+        });
+        cantidadmintxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    addProductActionPerformed(null);
+                }
+            }
+        });
+        cantidadmaxtxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    addProductActionPerformed(null);
+                }
+            }
+        });
+        reftxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    addProductActionPerformed(null);
+                }
+            }
+        });
         pnlAddProduct.add(addProduct, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 330, 270, 50));
 
         cantidadtxt.setBackground(new java.awt.Color(251, 252, 253));
@@ -454,12 +575,24 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
             }
         });
         pnlAddProduct.add(cantidadtxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 170, 270, 50));
+
+        cantidadmaxtxt.setBackground(new java.awt.Color(251, 252, 253));
+        cantidadmaxtxt.setForeground(new java.awt.Color(58, 59, 69));
+        cantidadmaxtxt.setBorderColor(new java.awt.Color(209, 211, 225));
+        cantidadmaxtxt.setCaretColor(new java.awt.Color(187, 187, 187));
+        cantidadmaxtxt.setFocusBorderColor(new java.awt.Color(75, 110, 175));
         pnlAddProduct.add(cantidadmaxtxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 250, 270, 50));
 
         jLabel23.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
         jLabel23.setForeground(new java.awt.Color(58, 59, 69));
         jLabel23.setText("Cantidad:");
         pnlAddProduct.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 150, -1, -1));
+
+        cantidadmintxt.setBackground(new java.awt.Color(251, 252, 253));
+        cantidadmintxt.setForeground(new java.awt.Color(58, 59, 69));
+        cantidadmintxt.setBorderColor(new java.awt.Color(209, 211, 225));
+        cantidadmintxt.setCaretColor(new java.awt.Color(187, 187, 187));
+        cantidadmintxt.setFocusBorderColor(new java.awt.Color(75, 110, 175));
         pnlAddProduct.add(cantidadmintxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 250, 270, 50));
 
         jLabel24.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -491,11 +624,92 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         jLabel16.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         pnlVentas.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
 
-        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        jLabel26.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel26.setText("Panel 4");
-        jLabel26.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        pnlVentas.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 210, 170, 60));
+        Porductotxt.setBackground(new java.awt.Color(251, 252, 253));
+        Porductotxt.setForeground(new java.awt.Color(209, 211, 225));
+        Porductotxt.setBorderColor(new java.awt.Color(209, 211, 225));
+        Porductotxt.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        pnlVentas.add(Porductotxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 120, 270, 50));
+
+        myButton1.setForeground(new java.awt.Color(255, 255, 255));
+        myButton1.setText("Vender");
+        myButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                myButton1ActionPerformed(evt);
+            }
+        });
+        txtCantidad.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    myButton1ActionPerformed(null);
+                }
+            }
+        });
+        pnlVentas.add(myButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 260, 270, 50));
+
+        txtCantidad.setBackground(new java.awt.Color(251, 252, 253));
+        txtCantidad.setForeground(new java.awt.Color(58, 59, 69));
+        txtCantidad.setBorderColor(new java.awt.Color(209, 211, 225));
+        txtCantidad.setCaretColor(new java.awt.Color(187, 187, 187));
+        txtCantidad.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        pnlVentas.add(txtCantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 200, 270, 50));
+
+        myTableH.setAutoCreateRowSorter(true);
+        myTableH.setBackground(new java.awt.Color(255, 255, 255));
+        myTableH.setForeground(new java.awt.Color(0, 0, 0));
+        myTableH.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(myTableH);
+
+        pnlVentas.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 460, 360));
+
+        jLabel25.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel25.setText("Cantidad:");
+        pnlVentas.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 180, -1, -1));
+
+        jLabel26.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel26.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel26.setText("Producto:");
+        pnlVentas.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 100, -1, -1));
+
+        btneliminar1.setBackground(new java.awt.Color(255, 51, 51));
+        btneliminar1.setForeground(new java.awt.Color(255, 255, 255));
+        btneliminar1.setText("Eliminar ultimo");
+        btneliminar1.setToolTipText("Envia el producto seleccionado a la papelera");
+        btneliminar1.setBorderColor(new java.awt.Color(255, 51, 51));
+        btneliminar1.setColor(new java.awt.Color(255, 51, 51));
+        btneliminar1.setColorClick(new java.awt.Color(255, 0, 0));
+        btneliminar1.setColorOver(new java.awt.Color(204, 0, 0));
+        btneliminar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btneliminar1ActionPerformed(evt);
+            }
+        });
+        pnlVentas.add(btneliminar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 320, 270, 50));
+
+        btneliminar2.setBackground(new java.awt.Color(255, 51, 51));
+        btneliminar2.setForeground(new java.awt.Color(255, 255, 255));
+        btneliminar2.setText("Limpiar historial");
+        btneliminar2.setToolTipText("Envia el producto seleccionado a la papelera");
+        btneliminar2.setBorderColor(new java.awt.Color(255, 51, 51));
+        btneliminar2.setColor(new java.awt.Color(255, 51, 51));
+        btneliminar2.setColorClick(new java.awt.Color(255, 0, 0));
+        btneliminar2.setColorOver(new java.awt.Color(204, 0, 0));
+        btneliminar2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btneliminar2ActionPerformed(evt);
+            }
+        });
+        pnlVentas.add(btneliminar2, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 380, 270, 50));
 
         Paginas.add(pnlVentas, "card5");
 
@@ -540,6 +754,34 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         creraUsu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 creraUsuActionPerformed(evt);
+            }
+        });
+        txtUsuario.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    creraUsuActionPerformed(null);
+                }
+            }
+        });
+        txtPalabra.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    creraUsuActionPerformed(null);
+                }
+            }
+        });
+        txtPass.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    creraUsuActionPerformed(null);
+                }
+            }
+        });
+        txtRepPass.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    creraUsuActionPerformed(null);
+                }
             }
         });
         pnlPerfiles.add(creraUsu, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 350, 560, 50));
@@ -897,6 +1139,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                 fileWriter.close();
 
                 infotable();
+                cargarDatosEnComboBox();
 
                 nombretxt.setText("");
                 cantidadtxt.setText("");
@@ -937,105 +1180,75 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
 
         // Verificar si hay una fila seleccionada
         if (filaSeleccionada != -1) {
-            // Obtener los valores de la fila seleccionada
+            // Obtener el ID y el nombre del producto seleccionado
             String idString = myTableP.getValueAt(filaSeleccionada, 0).toString();
             String nombre = myTableP.getValueAt(filaSeleccionada, 1).toString();
-            String ref = myTableP.getValueAt(filaSeleccionada, 2).toString();
-            String cantidadString = myTableP.getValueAt(filaSeleccionada, 3).toString();
 
-            // Validar si el ID y la cantidad son números válidos
-            try {
-                long cantidad = Long.parseLong(cantidadString);
+            // Pedir confirmación al usuario
+            int confirmacion = JOptionPane.showConfirmDialog(null, "¿Está seguro de editar el producto " + nombre + "?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                // Verificar si el ID es un número válido
+                try {
+                    long id = Long.parseLong(idString);
 
-                // Verificar si se intenta editar el ID
-                if (!idString.equals(Long.toString(filaSeleccionada))) {
-                    // Actualizar el archivo JSON con los nuevos valores
-                    actualizarJSON(filaSeleccionada, nombre, ref, cantidad);
-                    JOptionPane.showMessageDialog(null, "La edición de los productos fue exitosa");
-                } else {
-                    JOptionPane.showMessageDialog(null, "No se puede editar el ID en la fila " + (filaSeleccionada + 1));
+                    // Leer el archivo JSON
+                    JSONParser parser = new JSONParser();
+                    try (FileReader reader = new FileReader("db/inventario.json")) {
+                        Object data = parser.parse(reader);
+                        JSONObject jsonObject = (JSONObject) data;
+                        JSONArray productos = (JSONArray) jsonObject.get("Productos");
+
+                        // Buscar el producto por su ID
+                        for (Object p : productos) {
+                            JSONObject producto = (JSONObject) p;
+                            long productId = (long) producto.get("id");
+
+                            if (productId == id) {
+                                // Actualizar el estado del producto a "visible" si está en "oculto"
+                                String estado = (String) producto.get("estado");
+                                if (estado.equals("oculto")) {
+                                    producto.put("estado", "visible");
+                                }
+                                // Actualizar los datos del producto con los valores ingresados en la tabla
+                                String nuevoNombre = myTableP.getValueAt(filaSeleccionada, 1).toString();
+                                String nuevaReferencia = myTableP.getValueAt(filaSeleccionada, 2).toString();
+                                long nuevaCantidad = Long.parseLong(myTableP.getValueAt(filaSeleccionada, 3).toString());
+                                producto.put("nombre", nuevoNombre);
+                                producto.put("ref", nuevaReferencia);
+                                producto.put("cantidad", nuevaCantidad);
+
+                                break;
+                            }
+                        }
+
+                        // Actualizar el objeto JSON con la lista de productos modificada
+                        jsonObject.put("Productos", productos);
+
+                        // Escribir los cambios de vuelta al archivo JSON
+                        try (FileWriter file = new FileWriter("db/inventario.json")) {
+                            file.write(jsonObject.toJSONString());
+                            file.flush();
+                        }
+
+                        // Actualizar la tabla con la nueva información
+                        infotable();
+
+                        JOptionPane.showMessageDialog(null, "Producto editado correctamente", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (IOException | ParseException e) {
+                        e.printStackTrace();
+                    }
+                } catch (NumberFormatException ex) {
+                    // Manejar el caso cuando el ID no es un número válido
+                    System.out.println("Error en la fila " + filaSeleccionada + ": El ID no es un número válido");
                 }
-            } catch (NumberFormatException ex) {
-                // Manejar el caso cuando la cantidad no es un número válido
-                System.out.println("Error en la fila " + filaSeleccionada + ": La cantidad no es un número válido");
+            } else {
+                // El usuario canceló la edición
+                JOptionPane.showMessageDialog(null, "Edición cancelada", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Por favor, seleccione una fila para editar.");
+            JOptionPane.showMessageDialog(null, "Por favor, seleccione el producto a editar.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-
         myTableP.clearSelection();
-    }
-
-    private void actualizarJSON(int fila, String nombre, String ref, long cantidad) {
-        JSONArray productos = new JSONArray();
-
-        // Recorrer todas las filas de la tabla
-        for (int i = 0; i < myTableP.getRowCount(); i++) {
-            // Obtener los valores de la tabla
-            String filaIdString = myTableP.getValueAt(i, 0).toString();
-            String filaNombre = myTableP.getValueAt(i, 1).toString();
-            String filaRef = myTableP.getValueAt(i, 2).toString();
-            String filaCantidadString = myTableP.getValueAt(i, 3).toString();
-            JSONObject datosJSON = obtenerDatosDesdeJSON(i);
-
-            // Validar si el ID y la cantidad son números válidos
-            try {
-                long filaId = Long.parseLong(filaIdString);
-                long filaCantidad = Long.parseLong(filaCantidadString);
-                String estado = datosJSON.get("estado").toString(); // Obtener el estado desde el JSON
-                long cantidadMin = Long.parseLong(datosJSON.get("cantidadmin").toString()); // Obtener la cantidad mínima desde el JSON
-                long cantidadMax = Long.parseLong(datosJSON.get("cantidadmax").toString()); // Obtener la cantidad máxima desde el JSON
-
-                // Si es la fila que se está editando y el estado actual es "oculto", cambiarlo a "visible"
-                if (i == fila && "oculto".equals(estado)) {
-                    estado = "visible";
-                }
-
-                // Crear un objeto JSON para el producto
-                JSONObject producto = new JSONObject();
-                producto.put("id", filaId);
-                producto.put("nombre", filaNombre);
-                producto.put("ref", filaRef);
-                producto.put("cantidad", filaCantidad);
-                producto.put("estado", estado); // Agregar el estado al objeto JSON
-                producto.put("cantidadmin", cantidadMin); // Agregar la cantidad mínima al objeto JSON
-                producto.put("cantidadmax", cantidadMax); // Agregar la cantidad máxima al objeto JSON
-
-                // Agregar el producto al array de productos
-                productos.add(producto);
-            } catch (NumberFormatException ex) {
-                // Manejar el caso cuando el ID o la cantidad no son números válidos
-                System.out.println("Error en la fila " + i + ": El ID o la cantidad no son números válidos");
-            }
-        }
-
-        // Crear un objeto JSON que contiene el array de productos
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("Productos", productos);
-
-        // Escribir el objeto JSON en el archivo
-        try (FileWriter file = new FileWriter("db/inventario.json")) {
-            file.write(jsonObject.toJSONString());
-            file.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private JSONObject obtenerDatosDesdeJSON(int fila) {
-        // Leer el archivo JSON y obtener los datos del producto en la fila específica
-        JSONParser parser = new JSONParser();
-        try (FileReader reader = new FileReader("db/inventario.json")) {
-            JSONObject jsonObject = (JSONObject) parser.parse(reader);
-            JSONArray productos = (JSONArray) jsonObject.get("Productos");
-            JSONObject producto = (JSONObject) productos.get(fila);
-
-            return producto;
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-
-        return null; // Valor predeterminado si no se puede obtener el objeto JSON
     }//GEN-LAST:event_btneditarActionPerformed
 
     private void btneliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminarActionPerformed
@@ -1122,6 +1335,12 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
                     .filter(p -> "oculto".equals(((JSONObject) p).get("estado")))
                     .count();
 
+            if (cantidadProductosVisibles == 0) {
+                // No hay productos ocultos, llamar a la función infotable()
+                infotable();
+                return;
+            }
+
             array = new Object[(int) cantidadProductosVisibles][4];
 
             for (Object p : productos) {
@@ -1157,9 +1376,184 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnrecuperarActionPerformed
 
+    private void myButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton1ActionPerformed
+        String file = "db/inventario.json";
+        String ventasFile = "db/historial_ventas.json"; // Ruta del archivo de historial de ventas
+
+        String selectedItem = (String) Porductotxt.getSelectedItem();
+        String cantidad = txtCantidad.getText();
+        String[] parts = selectedItem.split(" - ");
+
+        if (parts.length == 2 && !cantidad.isEmpty()) {
+            String id = parts[0];
+            String nombreProducto = parts[1];
+
+            try {
+                // Leer el archivo JSON del inventario
+                JSONParser parser = new JSONParser();
+                JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(file));
+
+                // Obtener el array de productos
+                JSONArray productos = (JSONArray) jsonObject.get("Productos");
+
+                // Buscar el objeto correspondiente al ID seleccionado
+                for (Object obj : productos) {
+                    JSONObject producto = (JSONObject) obj;
+                    String productoId = producto.get("id").toString();
+                    if (productoId.equals(id)) {
+                        // Obtener la cantidad actual y restar la cantidad ingresada
+                        long cantidadActual = (long) producto.get("cantidad");
+                        long cantidadRestante = cantidadActual - Long.parseLong(cantidad);
+
+                        // Verificar si la cantidad restante es mayor o igual a 0
+                        if (cantidadRestante >= 0) {
+                            // Actualizar la cantidad en el objeto
+                            producto.put("cantidad", cantidadRestante);
+
+                            // Cambiar el estado a "oculto" si la cantidad llega a 0
+                            if (cantidadRestante == 0) {
+                                producto.put("estado", "oculto");
+                            }
+
+                            // Guardar los cambios en el archivo JSON del inventario
+                            FileWriter fileWriter = new FileWriter(file);
+                            fileWriter.write(jsonObject.toJSONString());
+                            fileWriter.flush();
+                            fileWriter.close();
+
+                            // Crear un objeto para almacenar los detalles de la venta
+                            JSONObject venta = new JSONObject();
+                            venta.put("productoNombre", nombreProducto);
+                            venta.put("cantidadVendida", cantidad != null ? Long.parseLong(cantidad) : 0);
+
+                            // Obtener la fecha y hora actual y formatearla como "dd/MM/yyyy hh:mm a"
+                            Date fechaActual = new Date();
+                            SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+                            String fechaVenta = formatoFecha.format(fechaActual);
+                            venta.put("fechaVenta", fechaVenta);
+
+                            // Verificar si el archivo de historial de ventas existe
+                            File ventasFileObj = new File(ventasFile);
+                            if (!ventasFileObj.exists()) {
+                                // Si el archivo no existe, crear un nuevo objeto JSON para el historial de ventas
+                                JSONObject ventasObject = new JSONObject();
+                                JSONArray ventasArray = new JSONArray();
+                                ventasArray.add(venta);
+                                ventasObject.put("Ventas", ventasArray);
+
+                                // Guardar el objeto JSON del historial de ventas en el archivo
+                                FileWriter newVentasFileWriter = new FileWriter(ventasFile);
+                                newVentasFileWriter.write(ventasObject.toJSONString());
+                                newVentasFileWriter.flush();
+                                newVentasFileWriter.close();
+                            } else {
+                                // Si el archivo existe, leer el archivo JSON del historial de ventas
+                                JSONObject ventasObject = (JSONObject) parser.parse(new FileReader(ventasFile));
+
+                                // Obtener el array de ventas
+                                JSONArray ventas = (JSONArray) ventasObject.get("Ventas");
+
+                                // Agregar el objeto de venta al array de ventas
+                                ventas.add(venta);
+
+                                // Guardar los cambios en el archivo JSON del historial de ventas
+                                FileWriter ventasFileWriter = new FileWriter(ventasFile);
+                                ventasFileWriter.write(ventasObject.toJSONString());
+                                ventasFileWriter.flush();
+                                ventasFileWriter.close();
+                            }
+
+                            // Vaciar los campos y seleccionar "seleccionar"
+                            txtCantidad.setText("");
+                            Porductotxt.setSelectedIndex(0);
+                            infotable();
+                            historialtable();
+
+                            // Notificar al usuario la cantidad restante
+                            JOptionPane.showMessageDialog(null, "Se han descontado " + cantidad + " del stock. Quedan " + cantidadRestante + " unidades.");
+
+                        } else {
+                            // Notificar al usuario la cantidad actual en stock
+                            JOptionPane.showMessageDialog(null, "No se puede realizar el descuento del stock. La cantidad en stock es de " + cantidadActual + " unidades.");
+                        }
+
+                        break; // Salir del bucle una vez que se encuentre el ID correspondiente
+                    }
+                }
+            } catch (IOException | ParseException e) {
+                e.printStackTrace();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, selecciona un elemento válido y especifica la cantidad.");
+        }
+    }//GEN-LAST:event_myButton1ActionPerformed
+
+    private void btneliminar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminar1ActionPerformed
+        String ventasFile = "db/historial_ventas.json"; // Ruta del archivo de historial de ventas
+
+        try {
+            // Leer el archivo JSON del historial de ventas
+            JSONParser parser = new JSONParser();
+            JSONObject ventasObject = (JSONObject) parser.parse(new FileReader(ventasFile));
+
+            // Obtener el array de ventas
+            JSONArray ventasArray = (JSONArray) ventasObject.get("Ventas");
+
+            // Verificar si hay elementos en el array de ventas
+            if (!ventasArray.isEmpty()) {
+                int confirmacion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar la última venta del historial?", "Confirmación", JOptionPane.YES_NO_OPTION);
+                if (confirmacion == JOptionPane.YES_OPTION) {
+                    // Eliminar el último elemento del array de ventas
+                    ventasArray.remove(ventasArray.size() - 1);
+
+                    // Guardar los cambios en el archivo JSON del historial de ventas
+                    FileWriter ventasFileWriter = new FileWriter(ventasFile);
+                    ventasFileWriter.write(ventasObject.toJSONString());
+                    ventasFileWriter.flush();
+                    ventasFileWriter.close();
+
+                    historialtable();
+
+                    JOptionPane.showMessageDialog(null, "Se ha eliminado la última venta del historial de ventas.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "No hay ventas registradas en el historial de ventas.");
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btneliminar1ActionPerformed
+
+    private void btneliminar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminar2ActionPerformed
+        String ventasFile = "db/historial_ventas.json"; // Ruta del archivo de historial de ventas
+
+        int confirmacion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas limpiar el historial de ventas?", "Confirmación", JOptionPane.YES_NO_OPTION);
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            try {
+                // Crear un objeto JSON vacío para el historial de ventas
+                JSONObject ventasObject = new JSONObject();
+                JSONArray ventasArray = new JSONArray();
+                ventasObject.put("Ventas", ventasArray);
+
+                // Guardar el objeto JSON vacío en el archivo de historial de ventas
+                FileWriter ventasFileWriter = new FileWriter(ventasFile);
+                ventasFileWriter.write(ventasObject.toJSONString());
+                ventasFileWriter.flush();
+                ventasFileWriter.close();
+
+                historialtable();
+
+                JOptionPane.showMessageDialog(null, "Se ha limpiado el historial de ventas.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_btneliminar2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MenuPlegable;
     private javax.swing.JPanel Paginas;
+    private principal.ComboBoxP Porductotxt;
     private principal.MyButton addProduct;
     private javax.swing.JLabel btnAddProduct;
     private javax.swing.JLabel btnInventario;
@@ -1167,6 +1561,8 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel btnVentas;
     private principal.MyButton btneditar;
     private principal.MyButton btneliminar;
+    private principal.MyButton btneliminar1;
+    private principal.MyButton btneliminar2;
     private principal.MyButton btnrecuperar;
     private principal.MyTextField cantidadmaxtxt;
     private principal.MyTextField cantidadmintxt;
@@ -1192,6 +1588,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1206,10 +1603,13 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
+    private principal.MyButton myButton1;
+    private principal.MyTable myTableH;
     private principal.MyTable myTableP;
     private principal.MyTextField nombretxt;
     private javax.swing.JPanel pnlAddProduct;
@@ -1217,6 +1617,7 @@ public class MenuPrincipalAdmin extends javax.swing.JFrame {
     private javax.swing.JPanel pnlPerfiles;
     private javax.swing.JPanel pnlVentas;
     private principal.MyTextField reftxt;
+    private principal.MyTextField txtCantidad;
     private principal.MyTextField txtPalabra;
     private principal.MyPasswordField txtPass;
     private principal.MyPasswordField txtRepPass;
