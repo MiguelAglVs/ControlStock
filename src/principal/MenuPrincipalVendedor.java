@@ -6,10 +6,15 @@ import java.io.IOException;
 
 import javax.swing.Timer;
 
-
 import login.Login;
 
 import desplazable.Desface;
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -24,7 +29,10 @@ public class MenuPrincipalVendedor extends javax.swing.JFrame {
         desplace = new Desface();
         initComponents();
         infotable();
+        historialtable();
+        cargarDatosEnComboBox();
     }
+
     private void infotable() {
 
         JSONParser parser = new JSONParser();
@@ -69,7 +77,76 @@ public class MenuPrincipalVendedor extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
+
+    private void historialtable() {
+        JSONParser parser = new JSONParser();
+
+        try {
+            Object data = parser.parse(new FileReader("db/historial_ventas.json"));
+
+            Object[][] array = null;
+            JSONObject jsonObject = (JSONObject) data;
+
+            JSONArray ventas = (JSONArray) jsonObject.get("Ventas");
+
+            int cont = 0;
+            array = new Object[ventas.size()][3];
+
+            for (Object v : ventas) {
+                JSONObject venta = (JSONObject) v;
+
+                String productoNombre = (String) venta.get("productoNombre");
+                long cantidadVendida = (long) venta.get("cantidadVendida");
+                String fechaVenta = (String) venta.get("fechaVenta");
+
+                array[cont][0] = productoNombre;
+                array[cont][1] = cantidadVendida;
+                array[cont][2] = fechaVenta;
+
+                cont++;
+            }
+
+            myTableH.setModel(new javax.swing.table.DefaultTableModel(
+                    array,
+                    new String[]{
+                        "Producto", "Cantidad Vendida", "Fecha Venta"
+                    }
+            ));
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarDatosEnComboBox() {
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("Seleccionar"); // Agrega la opción "Seleccionar" al modelo
+
+        JSONParser parser = new JSONParser();
+
+        try {
+            Object data = parser.parse(new FileReader("db/inventario.json"));
+            JSONObject jsonObject = (JSONObject) data;
+            JSONArray productos = (JSONArray) jsonObject.get("Productos");
+
+            for (Object p : productos) {
+                JSONObject producto = (JSONObject) p;
+                String estado = (String) producto.get("estado");
+
+                // Mostrar solo los productos con estado "visible"
+                if ("visible".equals(estado)) {
+                    long id = (long) producto.get("id");
+                    String nombre = (String) producto.get("nombre");
+                    String item = id + " - " + nombre;
+                    model.addElement(item);
+                }
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+
+        Porductotxt.setModel(model);
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -100,7 +177,13 @@ public class MenuPrincipalVendedor extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
         jLabel16 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        myTableH = new principal.MyTable();
         jLabel26 = new javax.swing.JLabel();
+        Porductotxt = new principal.ComboBoxP();
+        jLabel25 = new javax.swing.JLabel();
+        txtCantidad = new principal.MyTextField();
+        myButton1 = new principal.MyButton();
 
         jMenuItem1.setText("jMenuItem1");
 
@@ -262,11 +345,62 @@ public class MenuPrincipalVendedor extends javax.swing.JFrame {
         jLabel16.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         pnlVentas.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
 
-        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        jLabel26.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel26.setText("Panel 2");
-        jLabel26.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        pnlVentas.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 210, 170, 60));
+        myTableH.setAutoCreateRowSorter(true);
+        myTableH.setBackground(new java.awt.Color(255, 255, 255));
+        myTableH.setForeground(new java.awt.Color(0, 0, 0));
+        myTableH.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(myTableH);
+
+        pnlVentas.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 460, 360));
+
+        jLabel26.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel26.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel26.setText("Producto:");
+        pnlVentas.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 100, -1, -1));
+
+        Porductotxt.setBackground(new java.awt.Color(251, 252, 253));
+        Porductotxt.setForeground(new java.awt.Color(209, 211, 225));
+        Porductotxt.setBorderColor(new java.awt.Color(209, 211, 225));
+        Porductotxt.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        pnlVentas.add(Porductotxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 120, 270, 50));
+
+        jLabel25.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(58, 59, 69));
+        jLabel25.setText("Cantidad:");
+        pnlVentas.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 180, -1, -1));
+
+        txtCantidad.setBackground(new java.awt.Color(251, 252, 253));
+        txtCantidad.setForeground(new java.awt.Color(58, 59, 69));
+        txtCantidad.setBorderColor(new java.awt.Color(209, 211, 225));
+        txtCantidad.setCaretColor(new java.awt.Color(187, 187, 187));
+        txtCantidad.setFocusBorderColor(new java.awt.Color(75, 110, 175));
+        pnlVentas.add(txtCantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 200, 270, 50));
+
+        myButton1.setForeground(new java.awt.Color(255, 255, 255));
+        myButton1.setText("Vender");
+        myButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                myButton1ActionPerformed(evt);
+            }
+        });
+        txtCantidad.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    myButton1ActionPerformed(null);
+                }
+            }
+        });
+        pnlVentas.add(myButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 260, 270, 50));
 
         Paginas.add(pnlVentas, "card5");
 
@@ -327,9 +461,122 @@ public class MenuPrincipalVendedor extends javax.swing.JFrame {
         pnlVentas.setVisible(true);
     }//GEN-LAST:event_btnVentasMouseClicked
 
+    private void myButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton1ActionPerformed
+        String file = "db/inventario.json";
+        String ventasFile = "db/historial_ventas.json"; // Ruta del archivo de historial de ventas
+
+        String selectedItem = (String) Porductotxt.getSelectedItem();
+        String cantidad = txtCantidad.getText();
+        String[] parts = selectedItem.split(" - ");
+
+        if (parts.length == 2 && !cantidad.isEmpty()) {
+            String id = parts[0];
+            String nombreProducto = parts[1];
+
+            try {
+                // Leer el archivo JSON del inventario
+                JSONParser parser = new JSONParser();
+                JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(file));
+
+                // Obtener el array de productos
+                JSONArray productos = (JSONArray) jsonObject.get("Productos");
+
+                // Buscar el objeto correspondiente al ID seleccionado
+                for (Object obj : productos) {
+                    JSONObject producto = (JSONObject) obj;
+                    String productoId = producto.get("id").toString();
+                    if (productoId.equals(id)) {
+                        // Obtener la cantidad actual y restar la cantidad ingresada
+                        long cantidadActual = (long) producto.get("cantidad");
+                        long cantidadRestante = cantidadActual - Long.parseLong(cantidad);
+
+                        // Verificar si la cantidad restante es mayor o igual a 0
+                        if (cantidadRestante >= 0) {
+                            // Actualizar la cantidad en el objeto
+                            producto.put("cantidad", cantidadRestante);
+
+                            // Cambiar el estado a "oculto" si la cantidad llega a 0
+                            if (cantidadRestante == 0) {
+                                producto.put("estado", "oculto");
+                            }
+
+                            // Guardar los cambios en el archivo JSON del inventario
+                            FileWriter fileWriter = new FileWriter(file);
+                            fileWriter.write(jsonObject.toJSONString());
+                            fileWriter.flush();
+                            fileWriter.close();
+
+                            // Crear un objeto para almacenar los detalles de la venta
+                            JSONObject venta = new JSONObject();
+                            venta.put("productoNombre", nombreProducto);
+                            venta.put("cantidadVendida", cantidad != null ? Long.parseLong(cantidad) : 0);
+
+                            // Obtener la fecha y hora actual y formatearla como "dd/MM/yyyy hh:mm a"
+                            Date fechaActual = new Date();
+                            SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+                            String fechaVenta = formatoFecha.format(fechaActual);
+                            venta.put("fechaVenta", fechaVenta);
+
+                            // Verificar si el archivo de historial de ventas existe
+                            File ventasFileObj = new File(ventasFile);
+                            if (!ventasFileObj.exists()) {
+                                // Si el archivo no existe, crear un nuevo objeto JSON para el historial de ventas
+                                JSONObject ventasObject = new JSONObject();
+                                JSONArray ventasArray = new JSONArray();
+                                ventasArray.add(venta);
+                                ventasObject.put("Ventas", ventasArray);
+
+                                // Guardar el objeto JSON del historial de ventas en el archivo
+                                FileWriter newVentasFileWriter = new FileWriter(ventasFile);
+                                newVentasFileWriter.write(ventasObject.toJSONString());
+                                newVentasFileWriter.flush();
+                                newVentasFileWriter.close();
+                            } else {
+                                // Si el archivo existe, leer el archivo JSON del historial de ventas
+                                JSONObject ventasObject = (JSONObject) parser.parse(new FileReader(ventasFile));
+
+                                // Obtener el array de ventas
+                                JSONArray ventas = (JSONArray) ventasObject.get("Ventas");
+
+                                // Agregar el objeto de venta al array de ventas
+                                ventas.add(venta);
+
+                                // Guardar los cambios en el archivo JSON del historial de ventas
+                                FileWriter ventasFileWriter = new FileWriter(ventasFile);
+                                ventasFileWriter.write(ventasObject.toJSONString());
+                                ventasFileWriter.flush();
+                                ventasFileWriter.close();
+                            }
+
+                            // Vaciar los campos y seleccionar "seleccionar"
+                            txtCantidad.setText("");
+                            Porductotxt.setSelectedIndex(0);
+                            infotable();
+                            historialtable();
+
+                            // Notificar al usuario la cantidad restante
+                            JOptionPane.showMessageDialog(null, "Se han descontado " + cantidad + " del stock. Quedan " + cantidadRestante + " unidades.");
+
+                        } else {
+                            // Notificar al usuario la cantidad actual en stock
+                            JOptionPane.showMessageDialog(null, "No se puede realizar el descuento del stock. La cantidad en stock es de " + cantidadActual + " unidades.");
+                        }
+
+                        break; // Salir del bucle una vez que se encuentre el ID correspondiente
+                    }
+                }
+            } catch (IOException | ParseException e) {
+                e.printStackTrace();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, selecciona un elemento válido y especifica la cantidad.");
+        }
+    }//GEN-LAST:event_myButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MenuPlegable;
     private javax.swing.JPanel Paginas;
+    private principal.ComboBoxP Porductotxt;
     private javax.swing.JLabel btnInventario;
     private javax.swing.JLabel btnVentas;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
@@ -342,6 +589,7 @@ public class MenuPrincipalVendedor extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -349,10 +597,14 @@ public class MenuPrincipalVendedor extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator5;
+    private principal.MyButton myButton1;
+    private principal.MyTable myTableH;
     private principal.MyTable myTableP;
     private javax.swing.JPanel pnlInventario;
     private javax.swing.JPanel pnlVentas;
+    private principal.MyTextField txtCantidad;
     // End of variables declaration//GEN-END:variables
 }
