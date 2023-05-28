@@ -80,5 +80,18 @@ public class GestorArchivo {
         return usuarioEncontrado;
     }
 
+    public boolean existeUsuario(String nombreUsuario) throws IOException {
+        // Leer el archivo o acceder a la base de datos para buscar el usuario
+        List<Usuario> usuarios = leerUsuarios(); // Suponiendo que tienes un método para leer los usuarios existentes
+
+        // Verificar si el usuario ya existe en la lista
+        for (Usuario usuario : usuarios) {
+            if (usuario.getUsuario().equals(nombreUsuario)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     // Otros métodos para actualizar y borrar usuarios
 }

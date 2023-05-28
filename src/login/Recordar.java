@@ -4,22 +4,14 @@
  */
 package login;
 
-import java.awt.List;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
 
 /**
  *
@@ -156,7 +148,7 @@ public class Recordar extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void myButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton1ActionPerformed
-        String archivo = "usuarios.csv";
+        String archivo = "db/usuarios.csv";
 
         String usuario = txtUsuario.getText();
         String palabra = txtPalabra.getText();
